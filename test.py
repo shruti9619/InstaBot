@@ -6,26 +6,33 @@ BASE_URL="https://api.instagram.com/v1/"
 
 def self_info():
     req_url=BASE_URL+'users/self/?access_token=%s'%(APP_ACCESS_TOKEN)
-    r=requests.get(req_url)
-    print r.json()
-
+    try:
+        r=requests.get(req_url)
+        print r.json()
+    except:
+        print "Url request exception occurred!"
 
 
 self_info()
 
 def fetch_uid(username):
-    uid=1
+    uid=0
     req_url = BASE_URL + 'users/search?q=%s&access_token=%s' % (username,APP_ACCESS_TOKEN)
-    user_info=requests.get(req_url).json()
-    if user_info['meta']['code']==200:
-        if len(user_info['data']):
-            return user_info['data'][0]['id']
-    else:
-        print "Status code not 200!"
+    try:
+        user_info=requests.get(req_url).json()
+        if user_info['meta']['code']==200:
+            if len(user_info['data']):
+                return user_info['data'][0]['id']
+        else:
+            print "Status code not 200!"
+    except:
+        print "Url request exception occurred!"
     return uid
 
 def other_user(uid):
     print uid
+    if uid==0:
+        print 'Username could not be fetched!'
     req_url=BASE_URL+'users/%s?access_token=%s'%(uid,APP_ACCESS_TOKEN)
     try:
         r=requests.get(req_url).json()
