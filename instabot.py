@@ -207,7 +207,8 @@ def tag_collect(tag_name):
             print 'Number of images with the tag %s: %d ' % (tag_name, r['data']['media_count'])
             f = open("collection.csv",'ab')
             writer = csv.writer(f)
-            
+            writer.writerow([tag_name, r['data']['media_count']])
+            f.close()
 
 # method to show menu and take input
 def show_menu():
