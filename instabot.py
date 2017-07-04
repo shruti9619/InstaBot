@@ -7,7 +7,7 @@ APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
 MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post",
              "Fetch most recent posts of a user", "Fetch my most recent posts liked", "Like most recent post of a user",
-             "Fetch list of comments on a user's recent post","Quit"]
+             "Fetch list of comments on a user's recent post", "Post comment on a user's post" , "Quit"]
 
 
 # method to download files
@@ -151,7 +151,7 @@ def like_user_post(user_name):
 def fetch_user_recent_post_comments(user_name):
     uid = fetch_uid(user_name)
     if uid is not None:
-        media_id= fetch_most_recent_media_id(uid)
+        media_id = fetch_most_recent_media_id(uid)
         if media_id is not None:
             req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
             r=requests.get(req_url).json()
@@ -159,7 +159,7 @@ def fetch_user_recent_post_comments(user_name):
                 if len(r['data']):
                     print "The comments are :- \n"
                     for i in range(0,len(r['data'])):
-                        print r['data'][0]['from']['full_name'] + ": " + r['data'][0]['text']
+                        print r['data'][i]['from']['full_name'] + ": " + r['data'][i]['text']
                 else:
                     print "No comments yet! Be the first one to comment!"
             else:
@@ -170,7 +170,31 @@ def fetch_user_recent_post_comments(user_name):
         print "User doesn't exist!"
 
 
-# method to
+# method to add to comment in the most recent user post
+def post_comment_most_recent(user_name):
+    uid = fetch_uid(user_name)
+
+    if uid is not None:
+        media_id = fetch_most_recent_media_id(uid)
+
+        if media_id is not None:
+            req_url = BASE_URL + "media/%s/comments" % media_id
+            print "Please not that the comment should not exceed 300 characters, should not be in ALL capitals, " \
+                  "should not contain more than 4 hashtags and one URL link."
+            comment_msg = raw_input("Your comment: ")
+            comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+            r = requests.post(req_url,comment_payload).json()
+
+            if r['meta']['code'] == 200:
+                print "Comment posted successfully!"
+            else:
+                print "Failed to post comment. Try again!"
+
+        else:
+            print "Posts not found!"
+    else:
+        print "User doesn't exist!"
+
 
 # method to show menu and take input
 def show_menu():
@@ -213,6 +237,11 @@ def show_menu():
         elif menu_choice == 7:
             user_name = raw_input("Enter the name of user ")
             fetch_user_recent_post_comments(user_name)
+
+        elif menu_choice == 8:
+            user_name = raw_input("Enter the name of user ")
+            post_comment_most_recent(user_name)
+
         else:
             print 'Quitting...'
             exit(0)
