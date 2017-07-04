@@ -1,5 +1,7 @@
 import requests
 
+import urllib
+
 #my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
@@ -64,12 +66,36 @@ def fetch_other_user(uid):
 
 # method to fetch self posts
 def fetch_self_posts(num_posts):
-    print 'Stub'
+    req_url = BASE_URL+"users/self/media/recent/?access_token=%s" % APP_ACCESS_TOKEN
+    r = requests.get(req_url).json()
+    if r['meta']['code'] == 200:
+        if len(r['data']):
+            for i in range(0,len(r['data'])):
+                print 'ID: '+ r['data'][i]['id']
+                print 'Image Details: '
+                print r['data'][i]['images']['standard_resolution']
+                print '\n'
 
 
 # method to fetch others posts
 def fetch_other_posts(user_name, num_posts):
-    print 'Stub'
+    uid = fetch_uid(user_name)
+    req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%d" % (uid, APP_ACCESS_TOKEN, num_posts)
+
+    user_media = requests.get(req_url).json()
+
+    if user_media['meta']['code'] == 200:
+        if len(user_media['data']):
+            for i in range(0,len(user_media['data'])):
+                print 'ID: '+user_media['data'][i]['id']
+                print 'Image Details: '
+                print user_media['data'][i]['images']['standard_resolution']
+                print '\n'
+        else:
+            print 'Post does not exist!'
+    else:
+        print 'Status code other than 200 received!'
+
 
 
 # method to show menu and take input
