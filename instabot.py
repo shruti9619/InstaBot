@@ -37,7 +37,7 @@ def fetch_other_user(uid):
     # print uid for easiness's sake
     print uid
     if uid == 0:
-        print 'Username could not be fetched!'
+        print 'Username could not be fetched! \n\n'
     req_url=BASE_URL+'users/%s?access_token=%s' % (uid, APP_ACCESS_TOKEN)
     try:
         r=requests.get(req_url).json()
@@ -64,14 +64,17 @@ def show_menu():
         for i in range(0,len(MENU_LIST)):
             print '%d. %s' % (i+1, MENU_LIST[i])
 
-        menu_choice = int(raw_input())
-        if menu_choice == 1:
-            fetch_self_info()
-        if menu_choice == 2:
-            u_name = raw_input("Enter the username to fetch details.")
-            fetch_other_user(fetch_uid(u_name))
-        else:
-            exit(0)
+        try:
+            menu_choice = int(raw_input())
+            if menu_choice == 1:
+                fetch_self_info()
+            if menu_choice == 2:
+                u_name = raw_input("Enter the username to fetch details.")
+                fetch_other_user(fetch_uid(u_name))
+            else:
+                exit(0)
+        except:
+            print 'Something went wrong with your answer! \n Try again!'
 
 
 show_menu()
