@@ -5,7 +5,9 @@ import urllib
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
-MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post", "Fetch most recent posts of a user", "Fetch my most recent posts liked", "Like most recent post of a user", "Quit"]
+MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post",
+             "Fetch most recent posts of a user", "Fetch my most recent posts liked", "Like most recent post of a user",
+             "Fetch list of comments on a user's recent post","Quit"]
 
 
 # method to download files
@@ -109,7 +111,7 @@ def fetch_most_recent_liked_self(num_posts):
 
 
 def fetch_most_recent_media_id(uid):
-    req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=5" % (uid, APP_ACCESS_TOKEN)
+    req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=3" % (uid, APP_ACCESS_TOKEN)
 
     user_media = requests.get(req_url).json()
     if user_media['meta']['code'] == 200:
@@ -144,6 +146,31 @@ def like_user_post(user_name):
             print "Failed to like the post!22"
     return
 
+
+# method to fetch comments on the latest post of a user by username
+def fetch_user_recent_post_comments(user_name):
+    uid = fetch_uid(user_name)
+    if uid is not None:
+        media_id= fetch_most_recent_media_id(uid)
+        if media_id is not None:
+            req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+            r=requests.get(req_url).json()
+            if r['meta']['code'] == 200:
+                if len(r['data']):
+                    print "The comments are :- \n"
+                    for i in range(0,len(r['data'])):
+                        print r['data'][0]['from']['full_name'] + ": " + r['data'][0]['text']
+                else:
+                    print "No comments yet! Be the first one to comment!"
+            else:
+                print "Data inaccessible!"
+        else:
+            print "Posts not found!"
+    else:
+        print "User doesn't exist!"
+
+
+# method to
 
 # method to show menu and take input
 def show_menu():
@@ -182,6 +209,10 @@ def show_menu():
         elif menu_choice == 6:
             user_name = raw_input("Enter the name of user ")
             like_user_post(user_name)
+
+        elif menu_choice == 7:
+            user_name = raw_input("Enter the name of user ")
+            fetch_user_recent_post_comments(user_name)
         else:
             print 'Quitting...'
             exit(0)
