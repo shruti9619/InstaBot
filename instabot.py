@@ -1,11 +1,28 @@
 import requests
-
 import urllib
 
-#my key
+
+# my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
-MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post", "Fetch most recent posts of a user", "Quit"]
+MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post", "Fetch most recent posts of a user", "Fetch my most recent posts liked" "Quit"]
+
+
+# method to download files
+def download_method(r):
+    if r['meta']['code'] == 200:
+        if len(r['data']):
+            for i in range(0,len(r['data'])):
+                name = r['data'][i]['id'] + '.png'
+                print 'ID: '+ name
+                url = ['data'][i]['images']['standard_resolution']['url']
+                print 'Image Details: ' + url
+                urllib.urlretrieve(url, 'images/' + name)
+                print '\n'
+        else:
+            print '\n No data or media found!'
+    else:
+        print "Response couldn't be fetched!"
 
 
 # method to access self info
@@ -68,17 +85,8 @@ def fetch_other_user(uid):
 def fetch_self_posts(num_posts):
     req_url = BASE_URL+"users/self/media/recent/?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
     r = requests.get(req_url).json()
-    if r['meta']['code'] == 200:
-        if len(r['data']):
-            for i in range(0,len(r['data'])):
-                name = r['data'][i]['id'] + '.png'
-                print 'ID: '+ name
-                url = ['data'][i]['images']['standard_resolution']['url']
-                print 'Image Details: ' + url
-                urllib.urlretrieve(url, 'images/' + name)
-                print '\n'
-        else:
-            print '\n No data or media found!'
+    download_method(r)
+
 
 # method to fetch others posts
 def fetch_other_posts(user_name, num_posts):
@@ -86,23 +94,16 @@ def fetch_other_posts(user_name, num_posts):
     req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%s" % (uid, APP_ACCESS_TOKEN, str(num_posts))
 
     user_media = requests.get(req_url).json()
-
-    if user_media['meta']['code'] == 200:
-        if len(user_media['data']):
-            for i in range(0,len(user_media['data'])):
-                name = user_media['data'][i]['id']+'.png'
-                print 'ID: '+ name
-                url = user_media['data'][i]['images']['standard_resolution']['url']
-                print 'Image Details: '+ url
-                urllib.urlretrieve(url, 'images/'+name)
-                print '\n'
-        else:
-            print 'Post does not exist!'
-    else:
-        print 'Status code other than 200 received!'
-        print '\n\n'
+    download_method(user_media)
 
 
+# method to fetch most recent post liked by self
+def fetch_most_recent_liked_self(num_posts):
+    #uid = fetch_uid(user_name)
+    req_url = BASE_URL + "users/self/media/liked?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
+
+    r = requests.get(req_url).json()
+    download_method(r)
 
 # method to show menu and take input
 def show_menu():
@@ -133,11 +134,14 @@ def show_menu():
             user_name = raw_input("Enter the name of user that you would like to fetch ")
             num_of_posts = raw_input("Enter the number of posts that you would like to fetch ")
             fetch_other_posts(user_name, num_of_posts)
+
+        elif menu_choice == 5:
+            num_of_posts = raw_input("Enter the number of posts that you would like to fetch ")
+            fetch_most_recent_liked_self(num_of_posts)
         else:
             print 'Quitting...'
             exit(0)
         print '\n\n'
-
 
 
 show_menu()
