@@ -1,13 +1,15 @@
 import requests
 import urllib
-
+import csv
+from tagdataplot import plotter
 
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
 MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post",
              "Fetch most recent posts of a user", "Fetch my most recent posts liked", "Like most recent post of a user",
-             "Fetch list of comments on a user's recent post", "Post comment on a user's post" , "Quit"]
+             "Fetch list of comments on a user's recent post", "Post comment on a user's post" , "Fetch number of posts on a hashtag",
+             "Quit"]
 
 
 # method to download files
@@ -196,6 +198,17 @@ def post_comment_most_recent(user_name):
         print "User doesn't exist!"
 
 
+#  method to collect tag data from images and plot
+def tag_collect(tag_name):
+    req_url=BASE_URL+'tags/%s?access_token=%s'% (tag_name,APP_ACCESS_TOKEN)
+    r = requests.get(req_url).json()
+    if r['meta']['code'] == 200:
+        if len(r['data']):
+            print 'Number of images with the tag %s: %d ' % (tag_name, r['data']['media_count'])
+            f = open("collection.csv",'ab')
+            writer = csv.writer(f)
+            
+
 # method to show menu and take input
 def show_menu():
 
@@ -241,6 +254,10 @@ def show_menu():
         elif menu_choice == 8:
             user_name = raw_input("Enter the name of user ")
             post_comment_most_recent(user_name)
+
+        elif menu_choice == 9:
+            tag_name = raw_input("Enter a tag to search ")
+            tag_collect(tag_name)
 
         else:
             print 'Quitting...'
