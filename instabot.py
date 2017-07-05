@@ -13,6 +13,8 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Quit"]
 
 
+
+
 # method to download files
 def download_method(r):
     if r['meta']['code'] == 200:
@@ -41,6 +43,8 @@ def download_method(r):
         print "Response couldn't be fetched!"
 
 
+
+
 # method to access self info
 def fetch_self_info():
     req_url = BASE_URL+'users/self/?access_token=%s' % APP_ACCESS_TOKEN
@@ -58,6 +62,8 @@ def fetch_self_info():
         print "Url request exception occurred!"
 
 
+
+
 # method to fetch username from the api
 def fetch_uid(username):
     uid = None
@@ -72,6 +78,8 @@ def fetch_uid(username):
     except:
         print "Url request exception occurred!"
     return uid
+
+
 
 
 # method to fetch user details using the uid
@@ -98,11 +106,15 @@ def fetch_other_user(uid):
             print "exception occurred!"
 
 
+
+
 # method to fetch self posts
 def fetch_self_posts(num_posts):
     req_url = BASE_URL+"users/self/media/recent/?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
     r = requests.get(req_url).json()
     download_method(r)
+
+
 
 
 # method to fetch others posts
@@ -116,12 +128,17 @@ def fetch_other_posts(user_name, num_posts):
     else:
         print "User doesn't exist!"
 
+
+
+
 # method to fetch most recent post liked by self
 def fetch_most_recent_liked_self(num_posts):
     req_url = BASE_URL + "users/self/media/liked?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
 
     r = requests.get(req_url).json()
     download_method(r)
+
+
 
 
 # method to fetch self most recent post id
@@ -139,6 +156,8 @@ def fetch_self_most_recent_media_id():
     return None
 
 
+
+
 # method to fetch media id for recent post of user
 def fetch_most_recent_media_id(uid):
     req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=3" % (uid, APP_ACCESS_TOKEN)
@@ -152,6 +171,8 @@ def fetch_most_recent_media_id(uid):
     else:
          print "Failed to fetch post!"
     return None
+
+
 
 
 # method to like the most recent post of a user
@@ -177,6 +198,8 @@ def like_user_post(user_name):
     return
 
 
+
+
 # method to fetch comments on the latest post of a user by username
 def fetch_user_recent_post_comments(user_name):
     uid = fetch_uid(user_name)
@@ -200,6 +223,8 @@ def fetch_user_recent_post_comments(user_name):
         print "User doesn't exist!"
 
 
+
+
 # method to fetch comments on the latest post of a user by username
 def fetch_self_recent_post_comments():
         media_id = fetch_self_most_recent_media_id()
@@ -217,6 +242,8 @@ def fetch_self_recent_post_comments():
                 print "Data inaccessible!"
         else:
             print "Posts not found!"
+
+
 
 
 # method to add to comment in the most recent user post
@@ -245,6 +272,8 @@ def post_comment_most_recent(user_name):
         print "User doesn't exist!"
 
 
+
+
 #  method to collect tag data from images and plot
 def tag_collect(tag_name):
     req_url=BASE_URL+'tags/%s?access_token=%s'% (tag_name,APP_ACCESS_TOKEN)
@@ -257,6 +286,48 @@ def tag_collect(tag_name):
             writer.writerow([tag_name, r['data']['media_count']])
             f.close()
     plotter()
+
+#politics fir sports fir entertainment
+
+
+# method to collect data on various topics n plot trend
+def trend_collect():
+    politics_count = 0
+    sports_count = 0
+    entertainment_count = 0
+    trends = {"politics": ["india", "america", "border", "loc", "congress", "bjp", "trump", "obama", "modi",
+                            "namo", "brexit"],
+
+              "sports": ["football", "tennis", "cricket", "badminton", "realmadrid", "manu",
+                           "manchester", "golf", "olympics"],
+
+              "entertainment": ["hollywood", "bollywood", "films", "song", "concert", "theatre", "dance",
+                                  "hiphop", "comedy", "thriller"]
+              }
+    try:
+        for category in trends:
+
+                for i in range(0, len(trends[category])):
+                    req_url = BASE_URL + 'tags/%s?access_token=%s' % (trends[category][i], APP_ACCESS_TOKEN)
+                    r = requests.get(req_url).json()
+                    if r['meta']['code'] == 200:
+                        if len(r['data']):
+                            if category == "politics":
+                                politics_count += r['data']['media_count']
+
+                            elif category == "sports":
+                                sports_count += r['data']['media_count']
+
+                            elif category == "entertainment":
+                                entertainment_count += r['data']['media_count']
+    except:
+        print "Failed to fetch and analyse data"
+
+    print politics_count
+    print sports_count
+    print entertainment_count
+
+
 
 # method to show menu and take input
 def show_menu():
@@ -317,6 +388,6 @@ def show_menu():
         print '\n\n'
 
 
-show_menu()
-
+#show_menu()
+trend_collect()
 

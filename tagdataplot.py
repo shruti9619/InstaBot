@@ -21,3 +21,6 @@ def plotter():
     plt.title('Tag Trend Data')
 
     plt.show()
+
+def categoryplotter():
+    print
