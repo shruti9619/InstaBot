@@ -1,14 +1,15 @@
 import requests
 import urllib
 import csv
-from tagdataplot import plotter
+#from tagdataplot import plotter
 
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
 BASE_URL = "https://api.instagram.com/v1/"
 MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post",
-             "Fetch most recent posts of a user", "Fetch my most recent posts liked", "Like most recent post of a user",
-             "Fetch list of comments on a user's recent post", "Post comment on a user's post" , "Fetch number of posts on a hashtag",
+             "Fetch most recent posts of a user", "Fetch most recent posts liked by you", "Like most recent post of a user",
+             "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
+             "Fetch comments on your latest post ", "Fetch number of posts on a hashtag",
              "Quit"]
 
 
@@ -16,12 +17,23 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
 def download_method(r):
     if r['meta']['code'] == 200:
         if len(r['data']):
-            for i in range(0,len(r['data'])):
-                name = r['data'][i]['id'] + '.png'
+            for i in range(0, len(r['data'])):
+
+                if r['data'][i]['type'] == "image":
+                    url = r['data'][i]['images']['low_resolution']['url']
+                    # checking whether the image is a gif by tearing up the url to get extension of file
+                    if url[-3:] == "gif":
+                        name = r['data'][i]['id'] + '.gif'
+                    else:
+                        name = r['data'][i]['id'] + '.png'
+
+                elif r['data'][i]['type'] == "video":
+                    name = r['data'][i]['id'] + '.mp4'
+                    url = r['data'][i]['videos']['low_resolution']['url']
+
                 print 'ID: '+ name
-                url = ['data'][i]['images']['standard_resolution']['url']
-                print 'Image Details: ' + url
-                urllib.urlretrieve(url, 'images/' + name)
+                print 'Media Details: ' + url
+                urllib.urlretrieve(url, 'media/' + name)
                 print '\n'
         else:
             print '\n No data or media found!'
@@ -112,6 +124,22 @@ def fetch_most_recent_liked_self(num_posts):
     download_method(r)
 
 
+# method to fetch self most recent post id
+def fetch_self_most_recent_media_id():
+    req_url = BASE_URL + "users/self/media/recent/?access_token=%s&count=3" % (APP_ACCESS_TOKEN)
+
+    user_media = requests.get(req_url).json()
+    if user_media['meta']['code'] == 200:
+        if len(user_media['data']):
+            return user_media['data'][0]['id']
+        else:
+            print "Failed to fetch post!"
+    else:
+         print "Failed to fetch post!"
+    return None
+
+
+# method to fetch media id for recent post of user
 def fetch_most_recent_media_id(uid):
     req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=3" % (uid, APP_ACCESS_TOKEN)
 
@@ -170,6 +198,25 @@ def fetch_user_recent_post_comments(user_name):
             print "Posts not found!"
     else:
         print "User doesn't exist!"
+
+
+# method to fetch comments on the latest post of a user by username
+def fetch_self_recent_post_comments():
+        media_id = fetch_self_most_recent_media_id()
+        if media_id is not None:
+            req_url = BASE_URL + "media/%s/comments?access_token=ACCESS-TOKEN%s" % (str(media_id), APP_ACCESS_TOKEN)
+            r = requests.get(req_url).json()
+            if r['meta']['code'] == 200:
+                if len(r['data']):
+                    print "The comments are :- \n"
+                    for i in range(0, len(r['data'])):
+                        print r['data'][i]['text']
+                else:
+                    print "No comments yet! Be the first one to comment!"
+            else:
+                print "Data inaccessible!"
+        else:
+            print "Posts not found!"
 
 
 # method to add to comment in the most recent user post
@@ -257,6 +304,9 @@ def show_menu():
             post_comment_most_recent(user_name)
 
         elif menu_choice == 9:
+            fetch_self_recent_post_comments()
+
+        elif menu_choice == 10:
             tag_name = raw_input("Enter a tag to search ")
             tag_collect(tag_name)
 
