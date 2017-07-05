@@ -1,7 +1,8 @@
 import requests
 import urllib
 import csv
-from tagdataplot import plotter
+import datetime
+from tagdataplot import plotter, category_plotter
 
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
@@ -10,6 +11,7 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Fetch most recent posts of a user", "Fetch most recent posts liked by you", "Like most recent post of a user",
              "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
              "Fetch comments on your latest post ", "Fetch number of posts on a hashtag",
+             "Fetch categorised hashtag trends with advance data analytics services",
              "Quit"]
 
 
@@ -287,7 +289,7 @@ def tag_collect(tag_name):
             f.close()
     plotter()
 
-#politics fir sports fir entertainment
+
 
 
 # method to collect data on various topics n plot trend
@@ -295,6 +297,8 @@ def trend_collect():
     politics_count = 0
     sports_count = 0
     entertainment_count = 0
+
+    error_flag=False
     trends = {"politics": ["india", "america", "border", "loc", "congress", "bjp", "trump", "obama", "modi",
                             "namo", "brexit"],
 
@@ -322,10 +326,19 @@ def trend_collect():
                                 entertainment_count += r['data']['media_count']
     except:
         print "Failed to fetch and analyse data"
+        error_flag = True
 
-    print politics_count
-    print sports_count
-    print entertainment_count
+    if error_flag is False:
+        f = open("category_trend.csv", 'wb')
+        writer = csv.writer(f)
+        writer.writerow(['politics', politics_count])
+        writer.writerow(['sports', sports_count])
+        writer.writerow(['entertainment', entertainment_count])
+        writer.writerow(["timestamp", datetime.datetime.now()])
+        f.close()
+
+        category_plotter()
+
 
 
 
@@ -382,12 +395,15 @@ def show_menu():
             tag_name = raw_input("Enter a tag to search ")
             tag_collect(tag_name)
 
+        elif menu_choice == 11:
+            trend_collect()
+
         else:
             print 'Quitting...'
             exit(0)
         print '\n\n'
 
 
-#show_menu()
-trend_collect()
+show_menu()
+
 
