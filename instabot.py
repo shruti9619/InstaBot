@@ -1,7 +1,7 @@
 import requests
 import urllib
 import csv
-#from tagdataplot import plotter
+from tagdataplot import plotter
 
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
@@ -256,6 +256,7 @@ def tag_collect(tag_name):
             writer = csv.writer(f)
             writer.writerow([tag_name, r['data']['media_count']])
             f.close()
+    plotter()
 
 # method to show menu and take input
 def show_menu():
