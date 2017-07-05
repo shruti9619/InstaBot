@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ed939d17-7caa-47df-9dcd-d8b517a9d78e" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/specific_tag_trends.png" afterPath="$PROJECT_DIR$/specific_tag_trends.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/collection.csv" afterPath="$PROJECT_DIR$/collection.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/instabot.py" afterPath="$PROJECT_DIR$/instabot.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tagdataplot.py" afterPath="$PROJECT_DIR$/tagdataplot.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -42,13 +41,13 @@
         <entry file="file://$PROJECT_DIR$/collection.csv">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="85">
-              <caret line="5" column="23" lean-forward="false" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tagdataplot.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="tagdataplot.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tagdataplot.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="138">
@@ -60,7 +59,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="specific_tag_trends.png" pinned="false" current-in-tab="false">
+      <file leaf-file-name="specific_tag_trends.png" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/specific_tag_trends.png">
           <provider selected="true" editor-type-id="images">
             <state />
@@ -92,9 +91,9 @@
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/h.csv" />
         <option value="$PROJECT_DIR$/TagData.py" />
-        <option value="$PROJECT_DIR$/collection.csv" />
         <option value="$PROJECT_DIR$/tagdataplot.py" />
         <option value="$PROJECT_DIR$/instabot.py" />
+        <option value="$PROJECT_DIR$/collection.csv" />
       </list>
     </option>
   </component>
@@ -445,27 +444,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/category_trend.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/collection.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="23" lean-forward="false" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/specific_tag_trends.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/categorized_tag_trends.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -489,6 +467,27 @@
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/category_trend.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/collection.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/specific_tag_trends.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
       </provider>
     </entry>
   </component>
