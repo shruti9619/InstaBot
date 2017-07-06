@@ -298,32 +298,30 @@ def trend_collect():
     sports_count = 0
     entertainment_count = 0
 
-    error_flag=False
-    trends = {"politics": ["india", "america", "border", "loc", "congress", "bjp", "trump", "obama", "modi",
-                            "namo", "brexit"],
+    error_flag = False
+    trends = {"politics": ["india", "america", "trump", "obama", "modi", "namo", "brexit"],
 
-              "sports": ["football", "tennis", "cricket", "badminton", "realmadrid", "manu",
-                           "manchester", "golf", "olympics"],
+              "sports": ["football", "tennis", "cricket", "badminton", "realmadrid", "olympics"],
 
-              "entertainment": ["hollywood", "bollywood", "films", "song", "concert", "theatre", "dance",
-                                  "hiphop", "comedy", "thriller"]
+              "entertainment": ["hollywood", "bollywood", "films", "music", "theatre", "dance", "comedy"]
               }
     try:
         for category in trends:
 
                 for i in range(0, len(trends[category])):
-                    req_url = BASE_URL + 'tags/%s?access_token=%s' % (trends[category][i], APP_ACCESS_TOKEN)
+                    req_url = BASE_URL + 'tags/search?q=%s&access_token=%s' % (trends[category][i], APP_ACCESS_TOKEN)
                     r = requests.get(req_url).json()
                     if r['meta']['code'] == 200:
                         if len(r['data']):
-                            if category == "politics":
-                                politics_count += r['data']['media_count']
+                            for j in range(0, len(r['data'])):
+                                if category == "politics":
+                                    politics_count += r['data'][j]['media_count']
 
-                            elif category == "sports":
-                                sports_count += r['data']['media_count']
+                                elif category == "sports":
+                                    sports_count += r['data'][j]['media_count']
 
-                            elif category == "entertainment":
-                                entertainment_count += r['data']['media_count']
+                                elif category == "entertainment":
+                                    entertainment_count += r['data'][j]['media_count']
     except:
         print "Failed to fetch and analyse data"
         error_flag = True
