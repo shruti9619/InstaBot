@@ -37,7 +37,10 @@ def download_method(r):
 
                 print 'ID: '+ name
                 print 'Media Details: ' + url
-                urllib.urlretrieve(url, 'media/' + name)
+                try:
+                    urllib.urlretrieve(url, 'media/' + name)
+                except:
+                    print "Download error!"
                 print '\n'
         else:
             print '\n No data or media found!'
@@ -350,26 +353,64 @@ def atleast_n_likes(r, n):
 
 # method to choose with minimum likes
 def minimum_likes(r):
-
+    t = None
     n = r['data'][0]['likes']
     for i in range(1, len(r['data'])):
         if r['data'][i]['likes'] < n:
             n = r['data'][i]['likes']
             t = r['data'][i]
-    download_method(t)
-    return t
+    if t is not None:
+        if t['type'] == "image":
+            url = t['images']['low_resolution']['url']
+            # checking whether the image is a gif by tearing up the url to get extension of file
+            if url[-3:] == "gif":
+                name = t['id'] + '.gif'
+            else:
+                name = t['id'] + '.png'
+
+        elif t['type'] == "video":
+            name = t['id'] + '.mp4'
+            url = t['videos']['low_resolution']['url']
+
+        print 'ID: ' + name
+        print 'Media Details: ' + url
+        try:
+            urllib.urlretrieve(url, 'media/' + name)
+        except:
+            print "Download error!"
 
 
 # method to choose with max likes
 def max_likes(r):
 
+    t = None
     n = r['data'][0]['likes']
     for i in range(1, len(r['data'])):
-        if r['data'][i]['likes'] > n:
+        if r['data'][i]['likes'] >= n:
             n = r['data'][i]['likes']
             t = r['data'][i]
-    download_method(t)
-    return t
+
+    if t is None:
+        t = r['data'][0]
+
+    if t['type'] == "image":
+        url = t['images']['low_resolution']['url']
+        # checking whether the image is a gif by tearing up the url to get extension of file
+        if url[-3:] == "gif":
+            name = t['id'] + '.gif'
+        else:
+            name = t['id'] + '.png'
+
+    elif t['type'] == "video":
+        name = t['id'] + '.mp4'
+        url = t['videos']['low_resolution']['url']
+
+    print 'ID: ' + name
+    print 'Media Details: ' + url
+    try:
+        urllib.urlretrieve(url, 'media/' + name)
+    except:
+        print "Download error!"
 
 
 
@@ -377,42 +418,63 @@ def max_likes(r):
 def my_type(r, type_name):
 
     for i in range(0, len(r['data'])):
-        if r['data'][i]['type'] != type_name:
-            r['data'].pop(i)
+        if r['data'][i]['type'] == type_name:
+            t = r['data'][i]
+            if t is not None:
+                if t['type'] == "image":
+                    url = t['images']['low_resolution']['url']
+                    # checking whether the image is a gif by tearing up the url to get extension of file
+                    if url[-3:] == "gif":
+                        name = t['id'] + '.gif'
+                    else:
+                        name = t['id'] + '.png'
 
-    download_method(r)
-    return r
+                elif t['type'] == "video":
+                    name = t['id'] + '.mp4'
+                    url = t['videos']['low_resolution']['url']
 
-
-# method to choose with desired user who liked
-def my_type(r, user_name):
-
-    for i in range(0, len(r['data'])):
-        if r['data'][i]['type'] != user_name:
-            r['data'].pop(i)
-
-    download_method(r)
-    return r
-
+                print 'ID: ' + name
+                print 'Media Details: ' + url
+                try:
+                    urllib.urlretrieve(url, 'media/' + name)
+                except:
+                    print "Download error!"
 
 
 # method to choose with desired filter
 def my_filter(r, type_name):
 
     for i in range(0, len(r['data'])):
-        if r['data'][i]['filter'] != type_name:
-            r['data'].pop(i)
+        if r['data'][i]['filter'] == type_name:
+            t = r['data'][i]
+            if t is not None:
+                if t['type'] == "image":
+                    url = t['images']['low_resolution']['url']
+                    # checking whether the image is a gif by tearing up the url to get extension of file
+                    if url[-3:] == "gif":
+                        name = t['id'] + '.gif'
+                    else:
+                        name = t['id'] + '.png'
 
-    download_method(r)
-    return r
+                elif t['type'] == "video":
+                    name = t['id'] + '.mp4'
+                    url = t['videos']['low_resolution']['url']
+
+                print 'ID: ' + name
+                print 'Media Details: ' + url
+                try:
+                    urllib.urlretrieve(url, 'media/' + name)
+                except:
+                    print "Download error!"
 
 
 # method to choose the post from recent media of the user creatively
 def choose_creative(user_name,num_posts):
     # specific fetch menu list
+
     MENU_LIST_CREATIVE=["Search media with atleast a specific number of likes ", "Search media with minimum likes",
                         "Get media with maximum likes", "Search media with specific type(Video/Images)",
-                        "Search by specific filter"]
+                        "Search by specific filter", "Quit"]
 
     uid = fetch_uid(user_name)
     if uid is not None:
