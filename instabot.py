@@ -338,6 +338,18 @@ def trend_collect():
         category_plotter()
 
 
+# method to choose the post from recent media of the user creatively
+def choose_creative(user_name,num_posts):
+    uid = fetch_uid(user_name)
+    if uid is not None:
+        req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%s" % (uid, APP_ACCESS_TOKEN, str(num_posts))
+
+        user_media = requests.get(req_url).json()
+
+
+
+    else:
+        print "User doesn't exist!"
 
 
 # method to show menu and take input
