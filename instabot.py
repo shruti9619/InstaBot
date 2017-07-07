@@ -338,20 +338,124 @@ def trend_collect():
         category_plotter()
 
 
+# method to choose with atleast this much likes
+def atleast_n_likes(r, n):
+
+    for i in range(0, len(r['data'])):
+        if r['data'][i]['likes'] < n:
+            r['data'].pop(i)
+    download_method(r)
+    return r
+
+
+# method to choose with minimum likes
+def minimum_likes(r):
+
+    n = r['data'][0]['likes']
+    for i in range(1, len(r['data'])):
+        if r['data'][i]['likes'] < n:
+            n = r['data'][i]['likes']
+            t = r['data'][i]
+    download_method(t)
+    return t
+
+
+# method to choose with max likes
+def max_likes(r):
+
+    n = r['data'][0]['likes']
+    for i in range(1, len(r['data'])):
+        if r['data'][i]['likes'] > n:
+            n = r['data'][i]['likes']
+            t = r['data'][i]
+    download_method(t)
+    return t
+
+
+
+# method to choose with desired type
+def my_type(r, type_name):
+
+    for i in range(0, len(r['data'])):
+        if r['data'][i]['type'] != type_name:
+            r['data'].pop(i)
+
+    download_method(r)
+    return r
+
+
+# method to choose with desired user who liked
+def my_type(r, user_name):
+
+    for i in range(0, len(r['data'])):
+        if r['data'][i]['type'] != user_name:
+            r['data'].pop(i)
+
+    download_method(r)
+    return r
+
+
+
+# method to choose with desired filter
+def my_filter(r, type_name):
+
+    for i in range(0, len(r['data'])):
+        if r['data'][i]['filter'] != type_name:
+            r['data'].pop(i)
+
+    download_method(r)
+    return r
+
+
 # method to choose the post from recent media of the user creatively
 def choose_creative(user_name,num_posts):
-    MENU_LIST_CREATIVE=["Search media with atleast a specific number of likes ", "Search media with minimum likes", "Get media with maximum likes",
-                        "Search media with specific type(Video/Images)", "Get media liked by a specific user with username",
+    MENU_LIST_CREATIVE=["Search media with atleast a specific number of likes ", "Search media with minimum likes",
+                        "Get media with maximum likes", "Search media with specific type(Video/Images)",
                         "Search by specific filter"]
+
     uid = fetch_uid(user_name)
     if uid is not None:
         req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%s" % (uid, APP_ACCESS_TOKEN, str(num_posts))
 
-        user_media = requests.get(req_url).json()
+        try:
+            user_media = requests.get(req_url).json()
+        except:
+            print "Failed to fetch your services"
+            return
         while True:
             print "Please select choice of media filter :- \n"
-        for i in range(0,len(MENU_LIST_CREATIVE)):
-            print '%d. %s' % (i+1, MENU_LIST_CREATIVE[i])
+
+            for i in range(0,len(MENU_LIST_CREATIVE)):
+                print '%d. %s' % (i+1, MENU_LIST_CREATIVE[i])
+
+            try:
+                menu_choice = int(raw_input())
+            except:
+                print 'Something\'s wrong with your choice! \n Try again! '
+
+            if menu_choice == 1:
+                try:
+                    n = int(raw_input("Enter the minimum number of likes to look for "))
+                    atleast_n_likes(user_media, n)
+                except:
+                    print "Wrong input choice! Try again"
+
+            elif menu_choice == 2:
+                minimum_likes(user_media)
+
+            elif menu_choice == 3:
+                max_likes(user_media)
+
+            elif menu_choice == 4:
+                type_name = raw_input("Enter the type that you would like to fetch(video/image) ")
+                my_type(user_media, type_name)
+
+            elif menu_choice == 5:
+                type_name = raw_input("Enter the filter name that you would like to fetch ")
+                my_filter(user_media, type_name)
+            else:
+                return
+
 
     else:
         print "User doesn't exist!"
