@@ -2,7 +2,7 @@ import requests
 import urllib
 import csv
 import datetime
-from tagdataplot import plotter, category_plotter
+from tagdataplot import plotter, category_plotter, user_category_plotter
 
 # my key
 APP_ACCESS_TOKEN = "5683010082.f0c5981.7724a99b4e794e4a8d4976af727fe38d"
@@ -12,6 +12,7 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
              "Fetch comments on your latest post ", "Fetch user posts in creative styles", "Fetch number of posts on a hashtag",
              "Fetch categorised hashtag trends with advance data analytics services",
+             "Fetch desired data pattern from haszhtag analysis",
              "Quit"]
 
 
@@ -341,6 +342,39 @@ def trend_collect():
         category_plotter()
 
 
+# method to plot various stats by taking user input
+def user_def_trends():
+    trend_list = []
+    val_list = []
+    ans = True
+    while ans is True:
+
+        trend_list.append(raw_input("Enter tag to plot data for: "))
+        if raw_input("Do you want to add more tags (y/n) ?")[0].upper() == 'Y':
+            ans = True
+        else:
+            ans = False
+    f = open("custom_category_trend.csv", 'wb')
+    writer = csv.writer(f)
+    try:
+        for i in range(0, len(trend_list)):
+            req_url = BASE_URL + 'tags/search?q=%s&access_token=%s' % (trend_list[i], APP_ACCESS_TOKEN)
+            r = requests.get(req_url).json()
+            if r['meta']['code'] == 200:
+                if len(r['data']):
+                    count = 0
+                    for j in range(0, len(r['data'])):
+                        count += r['data'][j]['media_count']
+                    writer.writerow([trend_list[i], count])
+
+        writer.writerow(["timestamp", datetime.datetime.now()])
+    except:
+        print "Failed to fetch and analyse data"
+
+    f.close()
+    user_category_plotter()
+
+
 # method to choose with atleast this much likes
 def atleast_n_likes(r, n):
 
@@ -582,6 +616,9 @@ def show_menu():
 
         elif menu_choice == 12:
             trend_collect()
+
+        elif menu_choice == 13:
+            user_def_trends()
 
         else:
             print 'Quitting...'
