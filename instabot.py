@@ -10,7 +10,7 @@ BASE_URL = "https://api.instagram.com/v1/"
 MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your most recent post",
              "Fetch most recent posts of a user", "Fetch most recent posts liked by you", "Like most recent post of a user",
              "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
-             "Fetch comments on your latest post ", "Fetch number of posts on a hashtag",
+             "Fetch comments on your latest post ", "Fetch user posts in creative styles", "Fetch number of posts on a hashtag",
              "Fetch categorised hashtag trends with advance data analytics services",
              "Quit"]
 
@@ -340,13 +340,18 @@ def trend_collect():
 
 # method to choose the post from recent media of the user creatively
 def choose_creative(user_name,num_posts):
+    MENU_LIST_CREATIVE=["Search media with atleast a specific number of likes ", "Search media with minimum likes", "Get media with maximum likes",
+                        "Search media with specific type(Video/Images)", "Get media liked by a specific user with username",
+                        "Search by specific filter"]
     uid = fetch_uid(user_name)
     if uid is not None:
         req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%s" % (uid, APP_ACCESS_TOKEN, str(num_posts))
 
         user_media = requests.get(req_url).json()
-
-
+        while True:
+            print "Please select choice of media filter :- \n"
+        for i in range(0,len(MENU_LIST_CREATIVE)):
+            print '%d. %s' % (i+1, MENU_LIST_CREATIVE[i])
 
     else:
         print "User doesn't exist!"
@@ -402,10 +407,15 @@ def show_menu():
             fetch_self_recent_post_comments()
 
         elif menu_choice == 10:
+            user_name = raw_input("Enter the name of user that you would like to fetch ")
+            num_of_posts = raw_input("Enter the number of posts that you would like to search from ")
+            choose_creative(user_name,num_of_posts)
+
+        elif menu_choice == 11:
             tag_name = raw_input("Enter a tag to search ")
             tag_collect(tag_name)
 
-        elif menu_choice == 11:
+        elif menu_choice == 12:
             trend_collect()
 
         else:
