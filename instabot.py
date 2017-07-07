@@ -409,6 +409,7 @@ def my_filter(r, type_name):
 
 # method to choose the post from recent media of the user creatively
 def choose_creative(user_name,num_posts):
+    # specific fetch menu list
     MENU_LIST_CREATIVE=["Search media with atleast a specific number of likes ", "Search media with minimum likes",
                         "Get media with maximum likes", "Search media with specific type(Video/Images)",
                         "Search by specific filter"]
@@ -455,8 +456,6 @@ def choose_creative(user_name,num_posts):
                 my_filter(user_media, type_name)
             else:
                 return
-
-
     else:
         print "User doesn't exist!"
 
