@@ -117,7 +117,12 @@ def fetch_other_user(uid):
 # method to fetch self posts
 def fetch_self_posts(num_posts):
     req_url = BASE_URL+"users/self/media/recent/?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
-    r = requests.get(req_url).json()
+    try:
+        r = requests.get(req_url).json()
+
+    except:
+        print "Request couldn't be made"
+        return
     download_method(r)
 
 
@@ -129,7 +134,11 @@ def fetch_other_posts(user_name, num_posts):
     if uid is not None:
         req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=%s" % (uid, APP_ACCESS_TOKEN, str(num_posts))
 
-        user_media = requests.get(req_url).json()
+        try:
+            user_media = requests.get(req_url).json()
+        except:
+            print "Request couldn't be made"
+            return
         download_method(user_media)
     else:
         print "User doesn't exist!"
@@ -141,7 +150,11 @@ def fetch_other_posts(user_name, num_posts):
 def fetch_most_recent_liked_self(num_posts):
     req_url = BASE_URL + "users/self/media/liked?access_token=%s&count=%s" % (APP_ACCESS_TOKEN, str(num_posts))
 
-    r = requests.get(req_url).json()
+    try:
+        r = requests.get(req_url).json()
+    except:
+        print "Request couldn't be made"
+        return
     download_method(r)
 
 
@@ -151,7 +164,12 @@ def fetch_most_recent_liked_self(num_posts):
 def fetch_self_most_recent_media_id():
     req_url = BASE_URL + "users/self/media/recent/?access_token=%s&count=3" % (APP_ACCESS_TOKEN)
 
-    user_media = requests.get(req_url).json()
+    try:
+        user_media = requests.get(req_url).json()
+    except:
+        print "Request couldn't be made"
+        return
+
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
             return user_media['data'][0]['id']
@@ -168,7 +186,12 @@ def fetch_self_most_recent_media_id():
 def fetch_most_recent_media_id(uid):
     req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=3" % (uid, APP_ACCESS_TOKEN)
 
-    user_media = requests.get(req_url).json()
+    try:
+        user_media = requests.get(req_url).json()
+    except:
+        print "Request couldn't be made"
+        return
+
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
             return user_media['data'][0]['id']
@@ -193,7 +216,12 @@ def like_user_post(user_name):
         if media_id is not None:
             req_url=BASE_URL + "media/%s/likes" % str(media_id)
             token_payload = {"access_token": APP_ACCESS_TOKEN}
-            r=requests.post(req_url, token_payload).json()
+
+            try:
+                r=requests.post(req_url, token_payload).json()
+            except:
+                print "Request couldn't be made"
+                return
 
             if r['meta']['code'] != 200:
                 print "Failed to like the post! 11"
@@ -213,7 +241,12 @@ def fetch_user_recent_post_comments(user_name):
         media_id = fetch_most_recent_media_id(uid)
         if media_id is not None:
             req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
-            r=requests.get(req_url).json()
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+                return
+
             if r['meta']['code'] == 200:
                 if len(r['data']):
                     print "The comments are :- \n"
@@ -236,7 +269,12 @@ def fetch_self_recent_post_comments():
         media_id = fetch_self_most_recent_media_id()
         if media_id is not None:
             req_url = BASE_URL + "media/%s/comments?access_token=ACCESS-TOKEN%s" % (str(media_id), APP_ACCESS_TOKEN)
-            r = requests.get(req_url).json()
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+                return
+
             if r['meta']['code'] == 200:
                 if len(r['data']):
                     print "The comments are :- \n"
@@ -265,7 +303,11 @@ def post_comment_most_recent(user_name):
                   "should not contain more than 4 hashtags and one URL link."
             comment_msg = raw_input("Your comment: ")
             comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
-            r = requests.post(req_url,comment_payload).json()
+            try:
+                r = requests.post(req_url,comment_payload).json()
+            except:
+                print "Request couldn't be made"
+                return
 
             if r['meta']['code'] == 200:
                 print "Comment posted successfully!"
@@ -283,7 +325,12 @@ def post_comment_most_recent(user_name):
 #  method to collect tag data from images and plot
 def tag_collect(tag_name):
     req_url=BASE_URL+'tags/%s?access_token=%s'% (tag_name,APP_ACCESS_TOKEN)
-    r = requests.get(req_url).json()
+    try:
+        r = requests.get(req_url).json()
+    except:
+        print "Request couldn't be made"
+        return
+
     if r['meta']['code'] == 200:
         if len(r['data']):
             print 'Number of images with the tag %s: %d ' % (tag_name, r['data']['media_count'])
@@ -301,6 +348,7 @@ def trend_collect():
     politics_count = 0
     sports_count = 0
     entertainment_count = 0
+
 
     error_flag = False
     trends = {"politics": ["india", "america", "trump", "obama", "modi", "namo", "brexit"],
@@ -359,7 +407,11 @@ def user_def_trends():
     try:
         for i in range(0, len(trend_list)):
             req_url = BASE_URL + 'tags/search?q=%s&access_token=%s' % (trend_list[i], APP_ACCESS_TOKEN)
-            r = requests.get(req_url).json()
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "couldn't make the request"
+                return 
             if r['meta']['code'] == 200:
                 if len(r['data']):
                     count = 0
