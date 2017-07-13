@@ -12,7 +12,7 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
              "Fetch comments on your latest post ", "Fetch user posts in creative styles", "Fetch number of posts on a hashtag",
              "Fetch categorised hashtag trends with advance data analytics services",
-             "Fetch desired data pattern from haszhtag analysis",
+             "Fetch desired data pattern from haszhtag analysis", "Targeted marketing & promotion of your themes",
              "Quit"]
 
 
@@ -609,7 +609,7 @@ def choose_creative(user_name,num_posts):
 
 
 # method to fetch comments, captions, image from most recent post of users
-def fetch_data_keywords(user_name, word_to_find, message_to_post):
+def fetch_data_keywords(user_name, word_to_find):
     uid = fetch_uid(user_name)
     if uid is not None:
         media_id = fetch_most_recent_media_id(uid)
@@ -627,45 +627,97 @@ def fetch_data_keywords(user_name, word_to_find, message_to_post):
                             comment_words = r['data'][i]['text'].split()
                             for word in comment_words:
                                 if word == word_to_find:
-                                   #post msg and return whenever the keyword is found. be it any module!
+                                    req_url = BASE_URL + "media/%s/comments" % media_id
+                                    comment_msg = raw_input("Your message to post: ")
+                                    comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+                                    try:
+                                        r = requests.post(req_url, comment_payload).json()
+                                    except:
+                                        print "Request couldn't be made"
+                                        return
+
+                                    if r['meta']['code'] == 200:
+                                        print "Comment posted successfully!"
+                                    else:
+                                        print "Failed to post comment. Try again!"
+
                                     return
 
+                    else:
+                        print "nothing2"
+                else:
+                    print "nothing3"
+            else:
+                print "nothing4"
+        else:
+            print "nothing5"
 
-    # to fetch the things from caption and check
+    else:
+        print "nothing6"
+    # to fetch the things from tags and check
 
-            req_url = BASE_URL + "media/%s?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+    req_url = BASE_URL + "media/%s?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+    try:
+        r = requests.get(req_url).json()
+    except:
+        print "Request couldn't be made"
+
+    if r is not None:
+        if r['meta']['code'] == 200:
+            if len(r['data']):
+                if len(r['data']['tags']):
+                    print r['data']['tags']
+                    caption_words = r['data']['tags']
+                    for word in caption_words:
+                        if word == word_to_find:
+                            req_url = BASE_URL + "media/%s/comments" % media_id
+                            comment_msg = raw_input("Your message to post: ")
+                            comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+                            try:
+                                r = requests.post(req_url, comment_payload).json()
+                            except:
+                                print "Request couldn't be made"
+                                return
+
+                            if r['meta']['code'] == 200:
+                                print "Comment posted successfully!"
+                            else:
+                                print "Failed to post comment. Try again!"
+
+                            return
+# to fetch keywords from the media and check for matches
+    from clarifai.rest import ClarifaiApp
+
+    app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
+
+    # get the general model
+    model = app.models.get("food-items-v1.0")
+    if r['data']['type'] == "image":
+        image_url = r['data']['images']['low_resolution']['url']
+    # predict with the model
+    xd = model.predict_by_url(
+        url=image_url)
+
+    for names in range(0, len(xd['outputs'])):
+        if names['data']['concepts'][0]['name'] == word_to_find:
+            req_url = BASE_URL + "media/%s/comments" % media_id
+            comment_msg = raw_input("Your message to post: ")
+            comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
             try:
-                r = requests.get(req_url).json()
+                r = requests.post(req_url, comment_payload).json()
             except:
                 print "Request couldn't be made"
+                return
 
-            if r is not None:
-                if r['meta']['code'] == 200:
-                    if len(r['data']):
-                        if r['data']['caption'] is not None:
-                            caption_words = r['data']['caption'].split()
-                            for word in caption_words:
-                                if word == word_to_find:
-                                    # post msg and return whenever the keyword is found. be it any module!
-                                    return
+            if r['meta']['code'] == 200:
+                print "Comment posted successfully!"
+            else:
+                print "Failed to post comment. Try again!"
 
-            from clarifai.rest import ClarifaiApp
+            return
 
-            app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
-
-            # get the general model
-            model = app.models.get("food-items-v1.0")
-            if r['data']['type'] == "image":
-                image_url = r['data']['images']['low_resolution']['url']
-            # predict with the model
-            xd = model.predict_by_url(
-                url=image_url)
-
-            for names in range(0, len(xd['outputs'])):
-                if names['data']['concepts'][0]['name'] == word_to_find:
-                   # post comment related to the ad
-                    return
-
+    # if nothing matches then user will see this message
+    print "No keyword matches found!"
 
 
 
@@ -732,6 +784,12 @@ def show_menu():
 
         elif menu_choice == 13:
             user_def_trends()
+
+
+        elif menu_choice == 14:
+            user_name = raw_input("Enter the name of user that you would like to target ")
+            key_word = raw_input("Enter the keywords to search for ")
+            fetch_data_keywords(user_name,key_word)
 
         else:
             print 'Quitting...'
