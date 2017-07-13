@@ -13,10 +13,11 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Fetch comments on your latest post ", "Fetch user posts in creative styles", "Fetch number of posts on a hashtag",
              "Fetch categorised hashtag trends with advance data analytics services",
              "Fetch desired data pattern from haszhtag analysis", "Targeted marketing & promotion of your themes",
+             "Make comment sentiment analysis and test user's likability",
              "Quit"]
 
 
-
+PARALLEL_DOTS_KEY = "ddqUK3gJCSCzveJUZprtLXjHsiERfEa6dz0df1ZGi9c"
 
 # method to download files
 def download_method(r):
@@ -262,6 +263,23 @@ def fetch_user_recent_post_comments(user_name):
         print "User doesn't exist!"
 
 
+# method to fetch comments on the latest post of a user by username AND RETURN WITHOUT PRINTING
+def fetch_user_recent_comments_no_print(user_name):
+    uid = fetch_uid(user_name)
+    if uid is not None:
+        media_id = fetch_most_recent_media_id(uid)
+        if media_id is not None:
+            req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+                return
+
+            if r['meta']['code'] == 200:
+                if len(r['data']):
+                    return r
+            return
 
 
 # method to fetch comments on the latest post of a user by username
@@ -710,6 +728,32 @@ def fetch_data_keywords(user_name, word_to_find):
             print "No keyword matches found!"
 
 
+# method to make a sentiment analysis of comments on users posts
+def make_sentiment_analysis(user_name):
+        r = fetch_user_recent_comments_no_print(user_name)
+        pos_count = 0
+        neg_count = 0
+        if r is not None:
+            for i in range(0, len(r['data'])):
+                req_url = "http://apis.paralleldots.com/sentiment?sentence1=%s&apikey=%s" % (r['data'][i]['text'], PARALLEL_DOTS_KEY)
+                try:
+                    req_json = requests.get(req_url, verify = False).json()
+                except:
+                    print ""
+                if req_json is not None:
+                    sentiment = req_json['sentiment']
+                    #print sentiment
+                    if sentiment > 0.5:
+                        pos_count += 1
+                    else:
+                        neg_count += 1
+        print "positive: %d" % pos_count
+        print "negative count: %d" % neg_count
+        if neg_count > pos_count:
+            print "The posts of %s have been less liked and accepted by general public" % user_name
+        else:
+            print "The posts of %s have been favoured by general public" % user_name
+
 # method to show menu and take input
 def show_menu():
 
@@ -778,6 +822,10 @@ def show_menu():
             user_name = raw_input("Enter the name of user that you would like to target ")
             key_word = raw_input("Enter the keywords to search for ")
             fetch_data_keywords(user_name,key_word)
+
+        elif menu_choice == 15:
+            user_name = raw_input("Enter the name of user that you would like to target ")
+            make_sentiment_analysis(user_name)
 
         else:
             print 'Quitting...'
