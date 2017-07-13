@@ -411,7 +411,7 @@ def user_def_trends():
                 r = requests.get(req_url).json()
             except:
                 print "couldn't make the request"
-                return 
+                return
             if r['meta']['code'] == 200:
                 if len(r['data']):
                     count = 0
@@ -606,6 +606,67 @@ def choose_creative(user_name,num_posts):
                 return
     else:
         print "User doesn't exist!"
+
+
+# method to fetch comments, captions, image from most recent post of users
+def fetch_data_keywords(user_name, word_to_find, message_to_post):
+    uid = fetch_uid(user_name)
+    if uid is not None:
+        media_id = fetch_most_recent_media_id(uid)
+        if media_id is not None:
+            req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+
+            if r is not None:
+                if r['meta']['code'] == 200:
+                    if len(r['data']):
+                        for i in range(0, len(r['data'])):
+                            comment_words = r['data'][i]['text'].split()
+                            for word in comment_words:
+                                if word == word_to_find:
+                                   #post msg and return whenever the keyword is found. be it any module!
+                                    return
+
+
+    # to fetch the things from caption and check
+
+            req_url = BASE_URL + "media/%s?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+
+            if r is not None:
+                if r['meta']['code'] == 200:
+                    if len(r['data']):
+                        if r['data']['caption'] is not None:
+                            caption_words = r['data']['caption'].split()
+                            for word in caption_words:
+                                if word == word_to_find:
+                                    # post msg and return whenever the keyword is found. be it any module!
+                                    return
+
+            from clarifai.rest import ClarifaiApp
+
+            app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
+
+            # get the general model
+            model = app.models.get("food-items-v1.0")
+            if r['data']['type'] == "image":
+                image_url = r['data']['images']['low_resolution']['url']
+            # predict with the model
+            xd = model.predict_by_url(
+                url=image_url)
+
+            for names in range(0, len(xd['outputs'])):
+                if names['data']['concepts'][0]['name'] == word_to_find:
+                   # post comment related to the ad
+                    return
+
+
 
 
 # method to show menu and take input
