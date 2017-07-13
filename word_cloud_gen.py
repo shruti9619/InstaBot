@@ -16,9 +16,18 @@ def search_words_with_tags():
 
 
 
-search_words_with_tags()
+#search_words_with_tags()
 
+from clarifai.rest import ClarifaiApp
 
+app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
+
+# get the general model
+model = app.models.get("general-v1.3")
+
+# predict with the model
+xd= model.predict_by_url(url='https://samples.clarifai.com/metro-north.jpg')
+print xd
 
 #
 # from os import path

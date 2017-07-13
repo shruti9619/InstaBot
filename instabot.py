@@ -643,82 +643,71 @@ def fetch_data_keywords(user_name, word_to_find):
 
                                     return
 
-                    else:
-                        print "nothing2"
-                else:
-                    print "nothing3"
-            else:
-                print "nothing4"
-        else:
-            print "nothing5"
+            # to fetch the things from tags and check
 
-    else:
-        print "nothing6"
-    # to fetch the things from tags and check
-
-    req_url = BASE_URL + "media/%s?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
-    try:
-        r = requests.get(req_url).json()
-    except:
-        print "Request couldn't be made"
-
-    if r is not None:
-        if r['meta']['code'] == 200:
-            if len(r['data']):
-                if len(r['data']['tags']):
-                    print r['data']['tags']
-                    caption_words = r['data']['tags']
-                    for word in caption_words:
-                        if word == word_to_find:
-                            req_url = BASE_URL + "media/%s/comments" % media_id
-                            comment_msg = raw_input("Your message to post: ")
-                            comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
-                            try:
-                                r = requests.post(req_url, comment_payload).json()
-                            except:
-                                print "Request couldn't be made"
-                                return
-
-                            if r['meta']['code'] == 200:
-                                print "Comment posted successfully!"
-                            else:
-                                print "Failed to post comment. Try again!"
-
-                            return
-# to fetch keywords from the media and check for matches
-    from clarifai.rest import ClarifaiApp
-
-    app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
-
-    # get the general model
-    model = app.models.get("food-items-v1.0")
-    if r['data']['type'] == "image":
-        image_url = r['data']['images']['low_resolution']['url']
-    # predict with the model
-    xd = model.predict_by_url(
-        url=image_url)
-
-    for names in range(0, len(xd['outputs'])):
-        if names['data']['concepts'][0]['name'] == word_to_find:
-            req_url = BASE_URL + "media/%s/comments" % media_id
-            comment_msg = raw_input("Your message to post: ")
-            comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+            req_url = BASE_URL + "media/%s?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
             try:
-                r = requests.post(req_url, comment_payload).json()
+                r = requests.get(req_url).json()
             except:
                 print "Request couldn't be made"
-                return
 
-            if r['meta']['code'] == 200:
-                print "Comment posted successfully!"
-            else:
-                print "Failed to post comment. Try again!"
+            if r is not None:
+                if r['meta']['code'] == 200:
+                    if len(r['data']):
+                        if len(r['data']['tags']):
+                            print r['data']['tags']
+                            tag_words = r['data']['tags']
+                            for word in tag_words:
+                                if word == word_to_find:
+                                    req_url = BASE_URL + "media/%s/comments" % media_id
+                                    comment_msg = raw_input("Your message to post: ")
+                                    comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+                                    try:
+                                        r = requests.post(req_url, comment_payload).json()
+                                    except:
+                                        print "Request couldn't be made"
+                                        return
 
-            return
+                                    if r['meta']['code'] == 200:
+                                        print "Comment posted successfully!"
+                                    else:
+                                        print "Failed to post comment. Try again!"
 
-    # if nothing matches then user will see this message
-    print "No keyword matches found!"
+                                    return
 
+        # to fetch keywords from the media and check for matches
+            from clarifai.rest import ClarifaiApp
+
+            app = ClarifaiApp(api_key='ab7ff2b9dc2a4651909930166045d371')
+
+            # get the general model
+            model = app.models.get("food-items-v1.0")
+            if r['data']['type'] == "image":
+                image_url = r['data']['images']['low_resolution']['url']
+            # predict with the model
+            xd = model.predict_by_url(
+                url=image_url)
+
+            for i in range(0, len(xd['outputs'])):
+                if xd['outputs'][0]['data']['concepts'][i]['name'] == word_to_find:
+                    req_url = BASE_URL + "media/%s/comments" % media_id
+                    comment_msg = raw_input("Your message to post: ")
+                    comment_payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_msg}
+                    try:
+                        r = requests.post(req_url, comment_payload).json()
+                    except:
+                        print "Request couldn't be made"
+                        return
+
+                    if r['meta']['code'] == 200:
+                        print "Comment posted successfully!"
+                    else:
+                        print "Failed to post comment. Try again!"
+
+                    return
+
+            # if nothing matches then user will see this message
+            print "No keyword matches found!"
 
 
 # method to show menu and take input
@@ -784,7 +773,6 @@ def show_menu():
 
         elif menu_choice == 13:
             user_def_trends()
-
 
         elif menu_choice == 14:
             user_name = raw_input("Enter the name of user that you would like to target ")
