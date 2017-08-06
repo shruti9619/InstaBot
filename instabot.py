@@ -12,8 +12,9 @@ MENU_LIST = ["Fetch personal information.","Fetch info of a user.", "Fetch your 
              "Fetch list of comments on a user's recent post", "Post comment on a user's post" ,
              "Fetch comments on your latest post ", "Fetch user posts in creative styles", "Fetch number of posts on a hashtag",
              "Fetch categorised hashtag trends with advance data analytics services",
-             "Fetch desired data pattern from haszhtag analysis", "Targeted marketing & promotion of your themes",
+             "Fetch desired data pattern from hashtag analysis", "Targeted marketing & promotion of your themes",
              "Make comment sentiment analysis and test user's likability",
+             "Delete negative comments on user's most recent post",
              "Quit"]
 
 
@@ -185,7 +186,7 @@ def fetch_self_most_recent_media_id():
 
 # method to fetch media id for recent post of user
 def fetch_most_recent_media_id(uid):
-    req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=3" % (uid, APP_ACCESS_TOKEN)
+    req_url = BASE_URL + "users/%s/media/recent/?access_token=%s&count=2" % (uid, APP_ACCESS_TOKEN)
 
     try:
         user_media = requests.get(req_url).json()
@@ -282,7 +283,7 @@ def fetch_user_recent_comments_no_print(user_name):
             return
 
 
-# method to fetch comments on the latest post of a user by username
+# method to fetch comments on the latest post of a self
 def fetch_self_recent_post_comments():
         media_id = fetch_self_most_recent_media_id()
         if media_id is not None:
@@ -706,7 +707,7 @@ def fetch_data_keywords(user_name, word_to_find):
             xd = model.predict_by_url(
                 url=image_url)
 
-            for i in range(0, len(xd['outputs'])):
+            for i in range(0, len(xd['outputs'][0]['data']['concepts'])):
                 if xd['outputs'][0]['data']['concepts'][i]['name'] == word_to_find:
                     req_url = BASE_URL + "media/%s/comments" % media_id
                     comment_msg = raw_input("Your message to post: ")
@@ -753,6 +754,55 @@ def make_sentiment_analysis(user_name):
             print "The posts of %s have been less liked and accepted by general public" % user_name
         else:
             print "The posts of %s have been favoured by general public" % user_name
+
+
+#method to remove negative comments for the specified user in the most recent post by him
+def delete_abusive_comments(user_name):
+
+    flag = False
+    uid = fetch_uid(user_name)
+
+    if uid is not None:
+        media_id = fetch_most_recent_media_id(uid)
+        if media_id is not None:
+            print 'media id fetched'
+            req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
+            try:
+                r = requests.get(req_url).json()
+            except:
+                print "Request couldn't be made"
+                return
+
+            if r['meta']['code'] == 200:
+                if len(r['data']):
+                    print 'comments fetched'
+                    for i in range(0, len(r['data'])):
+                        req_url = "http://apis.paralleldots.com/sentiment?sentence1=%s&apikey=%s" % (
+                        r['data'][i]['text'], PARALLEL_DOTS_KEY)
+                        try:
+                            req_json = requests.get(req_url, verify=False).json()
+                        except:
+                            print "sentiment exception"
+                        if req_json is not None:
+                            sentiment = req_json['sentiment']
+                            if sentiment < 0.3:
+                                flag = True
+                                req_url = "https://api.instagram.com/v1/media/{media-id}/comments/{comment-id}?access_token=%s" \
+                                          % (media_id, int(r['data'][i]['id']), APP_ACCESS_TOKEN)
+                                r = requests.delete(req_url)
+
+                                if r is not None:
+                                    if r['meta']['code'] == 200:
+                                        print 'successfully deleted negative comments'
+
+                    if flag == False:
+                        print "No negative comments found on most recent post of user!"
+
+        else:
+            print 'No media found!'
+    else:
+        print 'No user found!'
+
 
 # method to show menu and take input
 def show_menu():
@@ -826,6 +876,10 @@ def show_menu():
         elif menu_choice == 15:
             user_name = raw_input("Enter the name of user that you would like to target ")
             make_sentiment_analysis(user_name)
+
+        elif menu_choice == 16:
+            user_name = raw_input("Enter the name of user that you would like to target ")
+            delete_abusive_comments(user_name)
 
         else:
             print 'Quitting...'
