@@ -765,7 +765,7 @@ def delete_abusive_comments(user_name):
     if uid is not None:
         media_id = fetch_most_recent_media_id(uid)
         if media_id is not None:
-            print 'media id fetched'
+
             req_url = BASE_URL + "media/%s/comments?access_token=%s" % (str(media_id), APP_ACCESS_TOKEN)
             try:
                 r = requests.get(req_url).json()
@@ -775,7 +775,7 @@ def delete_abusive_comments(user_name):
 
             if r['meta']['code'] == 200:
                 if len(r['data']):
-                    print 'comments fetched'
+
                     for i in range(0, len(r['data'])):
                         req_url = "http://apis.paralleldots.com/sentiment?sentence1=%s&apikey=%s" % (
                         r['data'][i]['text'], PARALLEL_DOTS_KEY)
@@ -789,8 +789,10 @@ def delete_abusive_comments(user_name):
                                 flag = True
                                 req_url = "https://api.instagram.com/v1/media/{media-id}/comments/{comment-id}?access_token=%s" \
                                           % (media_id, int(r['data'][i]['id']), APP_ACCESS_TOKEN)
-                                r = requests.delete(req_url)
-
+                                try:
+                                    r = requests.delete(req_url).json()
+                                except:
+                                    print "network problem occured!"
                                 if r is not None:
                                     if r['meta']['code'] == 200:
                                         print 'successfully deleted negative comments'
